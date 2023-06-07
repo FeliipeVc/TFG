@@ -96,21 +96,6 @@ def generate_frames(video_source):
 
     cap.release()
     
-def process_video(video_path):
-    cap = cv2.VideoCapture(video_path)
-    frames = []
-
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
-
-        processed_frame = detect_objects(model, device, frame)
-        frames.append(processed_frame)
-
-    cap.release()
-
-    return frames
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
