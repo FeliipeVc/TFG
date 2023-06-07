@@ -185,7 +185,6 @@ def video_feed(video_path):
 def video_feed_webcam():
     return Response(generate_frames(0), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-
 if __name__ == '__main__':
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     app.run(debug=True)
