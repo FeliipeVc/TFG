@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Webcam Feed</title>
+</head>
+<body>
+    <h1>Webcam Feed</h1>
+    <div>
+        <img id="video_feed" src="{{ url_for('video_feed_webcam') }}" width="640" height="480" style="border: 1px solid black;">
+    </div>
+    
+    <script>
+        // Function to update the webcam feed
+        function updateWebcamFeed() {
+            var imgElement = document.getElementById('video_feed');
+            imgElement.src = "{{ url_for('video_feed_webcam') }}" + "?" + new Date().getTime();
+        }
+        
+        // Refresh the webcam feed every second
+        setInterval(updateWebcamFeed, 100);
+    </script>
+</body>
+</html>
