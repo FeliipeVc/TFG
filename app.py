@@ -19,7 +19,6 @@ model = attempt_load(weights_path, device)
 model.eval()
 
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
-app.config['PROCESSED_FOLDER'] = 'static/processed'
 app.config['ALLOWED_EXTENSIONS'] = {'mp4'}
 
 # Variable global para guardar el último frame procesado
@@ -189,6 +188,5 @@ def video_feed_webcam():
 
 if __name__ == '__main__':
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    os.makedirs(app.config['PROCESSED_FOLDER'], exist_ok=True)
     app.run(debug=True)
 
