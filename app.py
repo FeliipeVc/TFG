@@ -1,3 +1,4 @@
+#Imports
 import os
 import torch
 from flask import Flask, render_template, Response, request, send_from_directory
@@ -11,23 +12,26 @@ import numpy as np
 from datetime import datetime
 import glob
 
+# Configuración de la aplicación Flask
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
+app.config['ALLOWED_EXTENSIONS'] = {'mp4'}
 
+# Cargar el modelo
 weights_path = 'yolov5m.pt'
 device = select_device('')
 model = attempt_load(weights_path, device)
 model.eval()
 
-app.config['UPLOAD_FOLDER'] = 'static/uploads'
-app.config['ALLOWED_EXTENSIONS'] = {'mp4'}
-
 # Variable global para guardar el último frame procesado
 latest_frame = None
 
+# Verifica si un archivo tiene una extensión permitida.
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
-
+           
+# Realiza la detección de objetos en un fotograma utilizando el modelo YOLOv5 y devuelve el fotograma con los objetos detectados dibujados.
 def detect_objects(model, device, frame):
     img_size = 640 # Reasignar el tamaño del frame para que sea igual que el tamaño del modelo
     frame = cv2.resize(frame, (img_size, img_size))
@@ -68,6 +72,7 @@ def detect_objects(model, device, frame):
 
     return frame
 
+# Genera los fotogramas de un video o de una fuente de video en vivo (webcam) y los pasa a través de la función 
 def generate_frames(video_source):
     if isinstance(video_source, str):
         # Abrir archivo de video
@@ -95,7 +100,7 @@ def generate_frames(video_source):
 
     cap.release()
     
-
+# Permite a los usuarios cargar un archivo de video para su procesamiento.
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
     if request.method == 'POST':
@@ -127,6 +132,7 @@ def upload():
 
     return render_template('upload.html')
     
+# Recibe un fotograma enviado por el cliente y devuelve el mismo fotograma con los objetos detectados.
 @app.route('/video_feed_client', methods=['POST'])
 def video_feed_client():
     global latest_frame
@@ -148,6 +154,7 @@ def video_feed_client():
 
     return frame_bytes
 
+# Devuelve el último fotograma procesado con los objetos detectados.
 @app.route('/processed_frame')
 def processed_frame():
     global latest_frame
@@ -161,26 +168,28 @@ def processed_frame():
 
     return Response(frame_bytes, mimetype='image/jpeg')
 
+# Renderiza la plantilla client.html que renederiza los fotogramas obtenidos desde el cliente.
 @app.route('/client')
 def client():
     return render_template('client.html')
 
+# Renderiza la plantilla index.html y muestra un video específico al cargar la página.
 @app.route('/')
 def index():
     video_path = 'Sam.mp4'  # Especificar la ruta del archivo a renderizar en el index
     return render_template('index.html', video_path=video_path)
 
-
+# Renderiza la plantilla webcam.html para mostrar el video de la webcam en la página.
 @app.route('/webcam')
 def webcam():
     return render_template('webcam.html')
 
-
+#  Genera un flujo de video a partir de un archivo de video específico.
 @app.route('/video_feed/<path:video_path>')
 def video_feed(video_path):
     return Response(generate_frames(video_path), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-
+# Genera un flujo de video a partir de la webcam.
 @app.route('/video_feed_webcam',)
 def video_feed_webcam():
     return Response(generate_frames(0), mimetype='multipart/x-mixed-replace; boundary=frame')
