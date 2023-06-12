@@ -184,7 +184,7 @@ def index():
 def webcam():
     return render_template('webcam.html')
 
-#  Genera un flujo de video a partir de un archivo de video específico.
+# Genera un flujo de video a partir de un archivo de video específico.
 @app.route('/video_feed/<path:video_path>')
 def video_feed(video_path):
     return Response(generate_frames(video_path), mimetype='multipart/x-mixed-replace; boundary=frame')
@@ -196,5 +196,5 @@ def video_feed_webcam():
 
 if __name__ == '__main__':
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=8000)
 
